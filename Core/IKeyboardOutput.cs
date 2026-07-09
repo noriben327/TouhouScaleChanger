@@ -1,4 +1,4 @@
-namespace ScalePad.Core;
+namespace TouhouScalePad.Core;
 
 public interface IKeyboardOutput
 {

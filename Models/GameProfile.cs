@@ -1,4 +1,4 @@
-namespace ScalePad.Models;
+namespace TouhouScalePad.Models;
 
 using System.Text.Json.Serialization;
 

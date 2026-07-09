@@ -4,8 +4,8 @@ from PIL import Image
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SOURCE = ROOT / "Assets" / "ScalePad-icon.png"
-OUTPUT = ROOT / "Assets" / "ScalePad.ico"
+SOURCE = ROOT / "Assets" / "TouhouScalePad-icon.png"
+OUTPUT = ROOT / "Assets" / "TouhouScalePad.ico"
 SIZES = [(16, 16), (20, 20), (24, 24), (32, 32), (40, 40), (48, 48), (64, 64), (128, 128), (256, 256)]
 
 

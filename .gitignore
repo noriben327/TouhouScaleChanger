@@ -1,4 +1,5 @@
 bin/
 obj/
 publish/
+TouhouScalePad.settings.json
 ScalePad.settings.json

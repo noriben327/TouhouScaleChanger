@@ -1,16 +1,16 @@
-# ScalePad
+# TouhouScalePad
 
-![ScalePad running with Touhou](Assets/README/scalepad-touhou-demo.jpg)
+![TouhouScalePad running with Touhou](Assets/README/touhou-scalepad-demo.jpg)
 
-ScalePadは、東方原作などのWindows用ゲームを今の環境で遊びやすくするため補助ツールです。
+TouhouScalePadは、東方原作などのWindows用ゲームを今の環境で遊びやすくするため補助ツールです。
 
 固定サイズのゲームウィンドウを見やすい大きさへ自動拡大し、Xboxコントローラーの十字キー入力をゲームが受け取りやすいカーソルキー入力へ変換できます。
 
 ## ダウンロード
 
-- [ScalePad v0.1.1 / Windows x64 zip](https://github.com/noriben327/ScalePad/releases/download/v0.1.1/ScalePad-v0.1.1-win-x64.zip)
+- [TouhouScalePad v0.2.0 / Windows x64 zip](https://github.com/noriben327/TouhouScalePad/releases/download/v0.2.0/TouhouScalePad-v0.2.0-win-x64.zip)
 
-zipを展開して、`ScalePad.exe` を起動してください。
+zipを展開して、`TouhouScalePad.exe` を起動してください。
 
 ## できること
 
@@ -25,7 +25,7 @@ zipを展開して、`ScalePad.exe` を起動してください。
 
 ## 想定用途
 
-ScalePadは次のようなケース向けです。
+TouhouScalePadは次のようなケース向けです。
 
 - 東方原作をちょうどいい大きさの画面で遊びたい
 - Xboxコントローラーの十字キーを使いたい
@@ -34,18 +34,18 @@ ScalePadは次のようなケース向けです。
 ## 使い方
 
 1. ゲームを起動します。
-2. ScalePadで「新規」→「起動中のウィンドウから選択」を押し、対象ゲームを選びます。
+2. TouhouScalePadで「新規」→「起動中のウィンドウから選択」を押し、対象ゲームを選びます。
 3. 拡大サイズと「十字キーをカーソルキーへ変換」のON/OFFを選びます。
 4. 「プロファイルを保存」を押します。
-5. 以後、ScalePadを起動したまま対象ゲームを起動すると、自動で設定が適用されます。
+5. 以後、TouhouScalePadを起動したまま対象ゲームを起動すると、自動で設定が適用されます。
 
 `.exe` ファイルを直接参照して登録することもできます。
 
 ## 配布形態
 
-ScalePadはzip配布を想定したポータブルアプリです。
+TouhouScalePadはzip配布を想定したポータブルアプリです。
 
-設定は `ScalePad.exe` と同じフォルダの `ScalePad.settings.json` に保存されます。アンインストールするときは、展開したScalePadフォルダを削除してください。
+設定は `TouhouScalePad.exe` と同じフォルダの `TouhouScalePad.settings.json` に保存されます。旧ScalePadの `ScalePad.settings.json` が同じフォルダにある場合は、初回起動時に読み込まれます。アンインストールするときは、展開したTouhouScalePadフォルダを削除してください。
 
 ## 製作
 Codex(GPT-5.5)を使用して製作しました

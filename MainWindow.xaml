@@ -1,8 +1,8 @@
-<Window x:Class="ScalePad.MainWindow"
+<Window x:Class="TouhouScalePad.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="ScalePad"
-        Icon="Assets/ScalePad.ico"
+        Title="TouhouScalePad"
+        Icon="Assets/TouhouScalePad.ico"
         Width="930" Height="680" MinWidth="820" MinHeight="600"
         WindowStartupLocation="CenterScreen"
         Background="{StaticResource PageBrush}"
@@ -22,7 +22,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel>
-                    <TextBlock Text="ScalePad" Foreground="White" FontSize="26" FontWeight="SemiBold" />
+                    <TextBlock Text="TouhouScalePad" Foreground="White" FontSize="26" FontWeight="SemiBold" />
                     <TextBlock Text="ゲーム画面の自動拡大とD-pad変換" Foreground="#BCC5D8" Margin="0,3,0,0" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">

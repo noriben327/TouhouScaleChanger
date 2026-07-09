@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace ScalePad.Interop;
+namespace TouhouScalePad.Interop;
 
 public sealed class WindowEventWatcher : IDisposable
 {

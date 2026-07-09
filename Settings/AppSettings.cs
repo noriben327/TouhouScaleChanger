@@ -1,6 +1,6 @@
-using ScalePad.Models;
+using TouhouScalePad.Models;
 
-namespace ScalePad.Settings;
+namespace TouhouScalePad.Settings;
 
 public sealed class AppSettings
 {

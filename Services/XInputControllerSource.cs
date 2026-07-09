@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
-using ScalePad.Core;
+using TouhouScalePad.Core;
 
-namespace ScalePad.Services;
+namespace TouhouScalePad.Services;
 
 public sealed class XInputControllerSource : IControllerSource
 {

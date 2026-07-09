@@ -5,16 +5,16 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.Win32;
-using ScalePad.Models;
-using ScalePad.Interop;
-using ScalePad.Services;
-using ScalePad.Settings;
+using TouhouScalePad.Models;
+using TouhouScalePad.Interop;
+using TouhouScalePad.Services;
+using TouhouScalePad.Settings;
 using Forms = System.Windows.Forms;
 using MediaColor = System.Windows.Media.Color;
 using WpfMessageBox = System.Windows.MessageBox;
 using WpfOpenFileDialog = Microsoft.Win32.OpenFileDialog;
 
-namespace ScalePad;
+namespace TouhouScalePad;
 
 public partial class MainWindow : Window
 {
@@ -42,7 +42,7 @@ public partial class MainWindow : Window
         _trayMonitoringItem = new Forms.ToolStripMenuItem("監視を一時停止");
         _trayMonitoringItem.Click += (_, _) => Dispatcher.Invoke(ToggleMonitoring);
         var trayMenu = new Forms.ContextMenuStrip();
-        trayMenu.Items.Add("ScalePadを開く", null, (_, _) => Dispatcher.Invoke(ShowFromTray));
+        trayMenu.Items.Add("TouhouScalePadを開く", null, (_, _) => Dispatcher.Invoke(ShowFromTray));
         trayMenu.Items.Add(_trayMonitoringItem);
         trayMenu.Items.Add(new Forms.ToolStripSeparator());
         trayMenu.Items.Add("終了", null, (_, _) => Dispatcher.Invoke(ExitApplication));
@@ -55,7 +55,7 @@ public partial class MainWindow : Window
 
         _trayIcon = new Forms.NotifyIcon
         {
-            Text = "ScalePad - ゲーム起動待機中",
+            Text = "TouhouScalePad - ゲーム起動待機中",
             Icon = _applicationIcon,
             ContextMenuStrip = trayMenu,
             Visible = true
@@ -168,12 +168,12 @@ public partial class MainWindow : Window
         var executablePath = ExecutablePathTextBox.Text.Trim();
         if (gameName.Length == 0 || executablePath.Length == 0 || !File.Exists(executablePath))
         {
-            WpfMessageBox.Show(this, "ゲーム名と、有効なゲーム実行ファイルを指定してください。", "ScalePad");
+            WpfMessageBox.Show(this, "ゲーム名と、有効なゲーム実行ファイルを指定してください。", "TouhouScalePad");
             return;
         }
         if (ProfileSizeComboBox.SelectedItem is not SizePreset sizePreset)
         {
-            WpfMessageBox.Show(this, "拡大サイズを選択してください。", "ScalePad");
+            WpfMessageBox.Show(this, "拡大サイズを選択してください。", "TouhouScalePad");
             return;
         }
 
@@ -182,7 +182,7 @@ public partial class MainWindow : Window
             string.Equals(item.ProcessName, processName, StringComparison.OrdinalIgnoreCase));
         if (duplicate is not null)
         {
-            WpfMessageBox.Show(this, $"{processName}.exe は「{duplicate.GameName}」ですでに登録されています。", "ScalePad");
+            WpfMessageBox.Show(this, $"{processName}.exe は「{duplicate.GameName}」ですでに登録されています。", "TouhouScalePad");
             return;
         }
 
@@ -208,7 +208,7 @@ public partial class MainWindow : Window
     private void DeleteProfileButton_OnClick(object sender, RoutedEventArgs e)
     {
         if (ProfileListBox.SelectedItem is not GameProfile profile) return;
-        if (WpfMessageBox.Show(this, $"「{profile.GameName}」を削除しますか？", "ScalePad",
+        if (WpfMessageBox.Show(this, $"「{profile.GameName}」を削除しますか？", "TouhouScalePad",
                 MessageBoxButton.YesNo, MessageBoxImage.Question) != MessageBoxResult.Yes) return;
         _settings.GameProfiles.Remove(profile);
         SaveSettings();
@@ -223,12 +223,12 @@ public partial class MainWindow : Window
         if (!int.TryParse(PresetWidthTextBox.Text, out var width) || !int.TryParse(PresetHeightTextBox.Text, out var height) ||
             width is < 100 or > 16384 || height is < 100 or > 16384)
         {
-            WpfMessageBox.Show(this, "幅と高さは100～16384の整数で指定してください。", "ScalePad");
+            WpfMessageBox.Show(this, "幅と高さは100～16384の整数で指定してください。", "TouhouScalePad");
             return;
         }
         if (_settings.SizePresets.Any(item => item.Width == width && item.Height == height))
         {
-            WpfMessageBox.Show(this, "同じサイズのプリセットがすでにあります。", "ScalePad");
+            WpfMessageBox.Show(this, "同じサイズのプリセットがすでにあります。", "TouhouScalePad");
             return;
         }
         var aspect = (PresetAspectComboBox.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "その他";
@@ -253,12 +253,12 @@ public partial class MainWindow : Window
         if (SizePresetListView.SelectedItem is not SizePreset preset) return;
         if (preset.IsBuiltIn)
         {
-            WpfMessageBox.Show(this, "標準プリセットは削除できません。", "ScalePad");
+            WpfMessageBox.Show(this, "標準プリセットは削除できません。", "TouhouScalePad");
             return;
         }
         if (_settings.GameProfiles.Any(item => item.SizePresetId == preset.Id))
         {
-            WpfMessageBox.Show(this, "このサイズを使用しているゲームプロファイルがあります。先にプロファイルを変更してください。", "ScalePad");
+            WpfMessageBox.Show(this, "このサイズを使用しているゲームプロファイルがあります。先にプロファイルを変更してください。", "TouhouScalePad");
             return;
         }
         _settings.SizePresets.Remove(preset);
@@ -299,7 +299,7 @@ public partial class MainWindow : Window
             HeaderStatusText.Text = e.ActiveGameCount > 0 ? $"ゲーム実行中 ({e.ActiveGameCount})" : e.Monitoring ? "ゲーム起動待機中" : "監視停止中";
             FooterStatusText.Text = e.Message;
             StatusIndicator.Fill = e.ActiveGameCount > 0 ? ActiveBrush : e.Monitoring ? WaitingBrush : PausedBrush;
-            _trayIcon.Text = e.ActiveGameCount > 0 ? "ScalePad - ゲームへ適用中" : e.Monitoring ? "ScalePad - ゲーム起動待機中" : "ScalePad - 監視停止中";
+            _trayIcon.Text = e.ActiveGameCount > 0 ? "TouhouScalePad - ゲームへ適用中" : e.Monitoring ? "TouhouScalePad - ゲーム起動待機中" : "TouhouScalePad - 監視停止中";
             UpdateMonitoringUi(e.Monitoring);
         });
     }
@@ -320,7 +320,7 @@ public partial class MainWindow : Window
         if (_reallyClosing) return;
         e.Cancel = true;
         Hide();
-        _trayIcon.ShowBalloonTip(1500, "ScalePad", "タスクトレイでゲームの起動を監視しています。", Forms.ToolTipIcon.Info);
+        _trayIcon.ShowBalloonTip(1500, "TouhouScalePad", "タスクトレイでゲームの起動を監視しています。", Forms.ToolTipIcon.Info);
     }
 
     private void ShowFromTray()
@@ -348,7 +348,7 @@ public partial class MainWindow : Window
         try { _settingsService.Save(_settings); }
         catch (Exception exception) when (exception is IOException or UnauthorizedAccessException)
         {
-            WpfMessageBox.Show(this, $"設定を保存できませんでした。\n{exception.Message}", "ScalePad");
+            WpfMessageBox.Show(this, $"設定を保存できませんでした。\n{exception.Message}", "TouhouScalePad");
         }
     }
 }

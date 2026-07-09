@@ -1,10 +1,10 @@
 using System.Diagnostics;
-using ScalePad.Models;
-using ScalePad.Services;
-using ScalePad.Settings;
+using TouhouScalePad.Models;
+using TouhouScalePad.Services;
+using TouhouScalePad.Settings;
 using Forms = System.Windows.Forms;
 
-namespace ScalePad.SmokeTests;
+namespace TouhouScalePad.SmokeTests;
 
 internal static class Program
 {
@@ -18,7 +18,7 @@ internal static class Program
             VerifyDefaultPresets();
             VerifyResizeKeepsPositionWhenRequested();
             VerifyEventDrivenResize();
-            Console.WriteLine("ScalePad smoke tests passed.");
+            Console.WriteLine("TouhouScalePad smoke tests passed.");
             return 0;
         }
         catch (Exception exception)
@@ -54,7 +54,7 @@ internal static class Program
         };
         form.Show();
         var originalLocation = form.Location;
-        var windows = new ScalePad.Interop.NativeWindowService();
+        var windows = new TouhouScalePad.Interop.NativeWindowService();
         Assert(windows.ResizeClientArea(form.Handle, 700, 500, centerWindow: false),
             "In-place resize failed.");
         Forms.Application.DoEvents();
@@ -83,8 +83,8 @@ internal static class Program
             [
                 new GameProfile
                 {
-                    GameName = "ScalePad smoke target",
-                    ProcessName = Path.GetFileNameWithoutExtension(Environment.ProcessPath) ?? "ScalePad.SmokeTests",
+                    GameName = "TouhouScalePad smoke target",
+                    ProcessName = Path.GetFileNameWithoutExtension(Environment.ProcessPath) ?? "TouhouScalePad.SmokeTests",
                     SizePresetId = preset.Id,
                     DpadMappingEnabled = true,
                     IsEnabled = true
@@ -102,7 +102,7 @@ internal static class Program
             UseShellExecute = false
         }) ?? throw new InvalidOperationException("Could not launch the smoke target.");
 
-        var native = new ScalePad.Interop.NativeWindowService();
+        var native = new TouhouScalePad.Interop.NativeWindowService();
         var timeout = Stopwatch.StartNew();
         var resized = false;
         while (timeout.Elapsed < TimeSpan.FromSeconds(5) && !target.HasExited)
@@ -127,15 +127,15 @@ internal static class Program
         Assert(selectableWindow is not null, "The running target was not listed by the window picker.");
         Assert(selectableWindow!.CanSelect && File.Exists(selectableWindow.ExecutablePath),
             "The window picker did not resolve the target executable path.");
-        Assert(selectableWindow.WindowTitle.Contains("ScalePad fixed-window", StringComparison.Ordinal),
+        Assert(selectableWindow.WindowTitle.Contains("TouhouScalePad fixed-window", StringComparison.Ordinal),
             "The window picker did not resolve the target window title.");
 
         timeout.Restart();
-        ScalePad.Interop.RunningWindowInfo? popupWindow = null;
+        TouhouScalePad.Interop.RunningWindowInfo? popupWindow = null;
         while (timeout.Elapsed < TimeSpan.FromSeconds(3) && popupWindow is null)
         {
             popupWindow = native.GetSelectableWindows(Environment.ProcessId)
-                .FirstOrDefault(item => item.ProcessId == target.Id && item.WindowTitle == "ScalePad popup regression target");
+                .FirstOrDefault(item => item.ProcessId == target.Id && item.WindowTitle == "TouhouScalePad popup regression target");
             Thread.Sleep(25);
         }
         Assert(popupWindow is not null, "The popup regression target was not created.");
@@ -158,7 +158,7 @@ internal static class Program
         Forms.Application.SetCompatibleTextRenderingDefault(false);
         using var form = new Forms.Form
         {
-            Text = "ScalePad fixed-window smoke target",
+            Text = "TouhouScalePad fixed-window smoke target",
             ClientSize = new System.Drawing.Size(320, 240),
             FormBorderStyle = Forms.FormBorderStyle.FixedSingle,
             StartPosition = Forms.FormStartPosition.Manual,
@@ -171,7 +171,7 @@ internal static class Program
             popupTimer.Stop();
             popup = new Forms.Form
             {
-                Text = "ScalePad popup regression target",
+                Text = "TouhouScalePad popup regression target",
                 ClientSize = new System.Drawing.Size(240, 120),
                 FormBorderStyle = Forms.FormBorderStyle.FixedToolWindow,
                 StartPosition = Forms.FormStartPosition.Manual,

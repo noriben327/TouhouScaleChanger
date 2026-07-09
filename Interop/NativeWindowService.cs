@@ -2,7 +2,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
 
-namespace ScalePad.Interop;
+namespace TouhouScalePad.Interop;
 
 public sealed class NativeWindowService
 {

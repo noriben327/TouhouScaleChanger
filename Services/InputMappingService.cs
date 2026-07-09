@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
-using ScalePad.Core;
+using TouhouScalePad.Core;
 
-namespace ScalePad.Services;
+namespace TouhouScalePad.Services;
 
 public sealed class InputMappingService : IDisposable
 {
@@ -47,7 +47,7 @@ public sealed class InputMappingService : IDisposable
             _thread = new Thread(() => PollLoop(_cancellation.Token))
             {
                 IsBackground = true,
-                Name = "ScalePad D-pad polling",
+                Name = "TouhouScalePad D-pad polling",
                 Priority = ThreadPriority.AboveNormal
             };
             IsRunning = true;

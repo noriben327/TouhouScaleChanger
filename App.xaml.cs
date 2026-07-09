@@ -1,7 +1,7 @@
 using System.Threading;
 using System.Windows;
 
-namespace ScalePad;
+namespace TouhouScalePad;
 
 public partial class App : System.Windows.Application
 {
@@ -10,10 +10,10 @@ public partial class App : System.Windows.Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
-        _singleInstanceMutex = new Mutex(true, "Local\\ScalePad.SingleInstance", out var isFirstInstance);
+        _singleInstanceMutex = new Mutex(true, "Local\\TouhouScalePad.SingleInstance", out var isFirstInstance);
         if (!isFirstInstance)
         {
-            System.Windows.MessageBox.Show("ScalePadはすでに起動しています。タスクトレイを確認してください。", "ScalePad");
+            System.Windows.MessageBox.Show("TouhouScalePadはすでに起動しています。タスクトレイを確認してください。", "TouhouScalePad");
             Shutdown();
             return;
         }
