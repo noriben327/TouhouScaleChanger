@@ -1,16 +1,16 @@
 # ScalePad
 
-## ダウンロード
-
-- [ScalePad v0.1.0 / Windows x64 zip](https://github.com/noriben327/ScalePad/releases/download/v0.1.0/ScalePad-v0.1.0-win-x64.zip)
-
-zipを展開して、`ScalePad.exe` を起動してください。
-
 ![ScalePad running with Touhou](Assets/README/scalepad-touhou-demo.jpg)
 
 ScalePadは、**東方Project原作などの古いWindows向けシューティングゲームを、今の環境で遊びやすくするため補助ツール**です。
 
 固定サイズのゲームウィンドウを見やすい大きさへ自動拡大し、Xboxコントローラーの十字キー入力をゲームが受け取りやすいカーソルキー入力へ変換できます。
+
+## ダウンロード
+
+- [ScalePad v0.1.0 / Windows x64 zip](https://github.com/noriben327/ScalePad/releases/download/v0.1.0/ScalePad-v0.1.0-win-x64.zip)
+
+zipを展開して、`ScalePad.exe` を起動してください。
 
 ## できること
 
