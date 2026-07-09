@@ -2,7 +2,7 @@
 
 ![ScalePad running with Touhou](Assets/README/scalepad-touhou-demo.jpg)
 
-ScalePadは、**東方Project原作などの古いWindows向けシューティングゲームを、今の環境で遊びやすくするため補助ツール**です。
+ScalePadは、東方原作などのWindows用ゲームを今の環境で遊びやすくするため補助ツールです。
 
 固定サイズのゲームウィンドウを見やすい大きさへ自動拡大し、Xboxコントローラーの十字キー入力をゲームが受け取りやすいカーソルキー入力へ変換できます。
 
