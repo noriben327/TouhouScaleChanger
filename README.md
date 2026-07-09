@@ -2,11 +2,9 @@
 
 ![ScalePad running with Touhou](Assets/README/scalepad-touhou-demo.jpg)
 
-ScalePadは、**東方Project原作などの古いWindows向けシューティングゲームを、今の環境で遊びやすくするための非公式補助ツール**です。
+ScalePadは、**東方Project原作などの古いWindows向けシューティングゲームを、今の環境で遊びやすくするため補助ツール**です。
 
 固定サイズのゲームウィンドウを見やすい大きさへ自動拡大し、Xboxコントローラーの十字キー入力をゲームが受け取りやすいカーソルキー入力へ変換できます。
-
-> ScalePadは東方Project公式ツールではありません。各ゲーム・作品の権利はそれぞれの権利者に帰属します。
 
 ## できること
 
@@ -41,29 +39,11 @@ ScalePadは、たとえば次のようなケース向けです。
 
 `.exe` ファイルを直接参照して登録することもできます。
 
-## 注意
-
-- 管理者権限で起動したゲームを操作する場合は、ScalePadも管理者権限で起動してください。
-- ScalePadはウィンドウサイズ変更とキー入力送信を行うため、一部のセキュリティソフトで警告される場合があります。
-- タイトルバーのシステムメニューなど、ゲームと同じプロセスが作る一時的なポップアップはリサイズ対象から除外します。
-- 中央配置は最初の適用時だけ行い、再適用時はユーザーが移動したゲームウィンドウの位置を維持します。
-
 ## 配布形態
 
 ScalePadはzip配布を想定したポータブルアプリです。
 
 設定は `ScalePad.exe` と同じフォルダの `ScalePad.settings.json` に保存されます。アンインストールするときは、展開したScalePadフォルダを削除してください。
 
-## ビルド
-
-```bash
-dotnet build ScalePad.csproj -c Release
-```
-
-単体EXE:
-
-```bash
-dotnet publish ScalePad.csproj -c Release -r win-x64 --self-contained true \
-  -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true \
-  -o publish/singlefile
-```
+## 製作
+Codex(GPT-5.5)を使用して製作しました
