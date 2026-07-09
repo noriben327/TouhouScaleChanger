@@ -1,6 +1,6 @@
 # TouhouScaleChanger
 
-![TouhouScaleChanger running with Touhou](Assets/README/touhou-scale-changer-demo.jpg)
+![TouhouScaleChanger running with Touhou](Assets/README/touhou-scale-changer-demo.png)
 
 ## 東方原作を遊ぶときに自分の好きなウィンドウサイズにしたい！というときのためのツールです
 
