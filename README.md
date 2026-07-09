@@ -3,7 +3,6 @@
 ## ダウンロード
 
 - [ScalePad v0.1.0 / Windows x64 zip](https://github.com/noriben327/ScalePad/releases/download/v0.1.0/ScalePad-v0.1.0-win-x64.zip)
-- [リリースページ](https://github.com/noriben327/ScalePad/releases)
 
 zipを展開して、`ScalePad.exe` を起動してください。
 
