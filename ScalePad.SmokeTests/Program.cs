@@ -33,6 +33,8 @@ internal static class Program
         var settings = AppSettings.CreateDefault();
         Assert(settings.SizePresets.Any(item => item.Width == 1600 && item.Height == 1200 && item.AspectGroup == "4:3"),
             "1600x1200 preset is missing.");
+        Assert(settings.SizePresets.Any(item => item.Width == 1400 && item.Height == 1050 && item.AspectGroup == "4:3"),
+            "1400x1050 preset is missing.");
         Assert(settings.SizePresets.Count(item => item.AspectGroup == "4:3") >= 5,
             "Expected multiple 4:3 presets.");
         Assert(settings.SizePresets.Count(item => item.AspectGroup == "16:9") >= 4,
