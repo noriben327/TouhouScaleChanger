@@ -15,6 +15,12 @@ public static class AppLog
     private static readonly string LogPath = Path.Combine(LogDirectory, "touhouscalechanger.log");
     private const long MaxLogBytes = 512 * 1024;
 
+    // Opt-in only: normal end-user runs must not create any folder or file on the machine.
+    // Diagnostics are enabled by setting the environment variable TOUHOUSCALECHANGER_LOG=1
+    // before launching. When disabled, every logging call is a no-op that touches no disk.
+    private static readonly bool Enabled =
+        Environment.GetEnvironmentVariable("TOUHOUSCALECHANGER_LOG") is "1" or "true" or "TRUE";
+
     public static string DirectoryPath => LogDirectory;
 
     public static void Info(string message) => Write("INFO", message, null);
@@ -23,6 +29,7 @@ public static class AppLog
 
     private static void Write(string level, string message, Exception? exception)
     {
+        if (!Enabled) return;
         try
         {
             lock (Sync)

@@ -89,6 +89,7 @@ public sealed class InputMappingService : IDisposable
         var previous = DpadButtons.None;
         var connected = false;
         var controllerIndex = -1;
+        string? lastErrorMessage = null;
         TimeBeginPeriod(1);
         try
         {
@@ -123,6 +124,10 @@ public sealed class InputMappingService : IDisposable
                         controllerIndex = -1;
                         StatusChanged?.Invoke(this, new MappingStatusChangedEventArgs(false, null, null));
                     }
+
+                    // A normal iteration completed: clear the error latch so that a genuinely
+                    // new failure later is reported once again.
+                    lastErrorMessage = null;
                 }
                 catch (Exception exception)
                 {
@@ -130,11 +135,22 @@ public sealed class InputMappingService : IDisposable
                     // process. Controller/HID drivers can throw a range of types (Win32,
                     // DllNotFound, SEH/AccessViolation-wrapped, etc.), so catch all, recover,
                     // and keep polling instead of crashing.
-                    AppLog.Error("D-padポーリング中に例外が発生しました。", exception);
-                    try { _keyboardOutput.ReleaseAll(previous); } catch (Exception releaseException) { AppLog.Error("キー解放に失敗しました。", releaseException); }
+                    //
+                    // The loop spins every 1-4 ms, so a persistent driver fault would otherwise
+                    // flood the log and the UI every iteration. Report only on the transition
+                    // into a new error state; stay silent while the same error keeps repeating.
+                    var isNewError = exception.Message != lastErrorMessage;
+                    if (isNewError)
+                    {
+                        AppLog.Error("D-padポーリング中に例外が発生しました。", exception);
+                        try { _keyboardOutput.ReleaseAll(previous); }
+                        catch (Exception releaseException) { AppLog.Error("キー解放に失敗しました。", releaseException); }
+                        StatusChanged?.Invoke(this, new MappingStatusChangedEventArgs(false, null, exception.Message));
+                        lastErrorMessage = exception.Message;
+                    }
                     previous = DpadButtons.None;
                     connected = false;
-                    StatusChanged?.Invoke(this, new MappingStatusChangedEventArgs(false, null, exception.Message));
+                    controllerIndex = -1;
                 }
 
                 if (token.WaitHandle.WaitOne(PollingIntervalMilliseconds)) break;
