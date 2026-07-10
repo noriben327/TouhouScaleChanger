@@ -10,7 +10,7 @@
 
 ## ダウンロード
 
-- [TouhouScaleChanger v0.3.0 / Windows x64 zip](https://github.com/noriben327/TouhouScaleChanger/releases/download/v0.3.0/TouhouScaleChanger-v0.3.0-win-x64.zip)
+- [TouhouScaleChanger v0.3.1 / Windows x64 zip](https://github.com/noriben327/TouhouScaleChanger/releases/download/v0.3.1/TouhouScaleChanger-v0.3.1-win-x64.zip)
 
 zipを展開して、`TouhouScaleChanger.exe` を起動してください。
 
