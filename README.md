@@ -59,4 +59,4 @@ TouhouScaleChangerはzip配布を想定したポータブルアプリです。
 TouhouScaleChangerは東方Project公式ツールではありません。
 
 ## 製作
-Codexを使用して製作しました。
+CodexとClaudeを使用して製作しました。
