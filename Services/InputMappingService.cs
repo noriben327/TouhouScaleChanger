@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using TouhouScaleChanger.Core;
+using TouhouScaleChanger.Diagnostics;
 
 namespace TouhouScaleChanger.Services;
 
@@ -123,9 +124,14 @@ public sealed class InputMappingService : IDisposable
                         StatusChanged?.Invoke(this, new MappingStatusChangedEventArgs(false, null, null));
                     }
                 }
-                catch (Exception exception) when (exception is Win32Exception or DllNotFoundException or EntryPointNotFoundException)
+                catch (Exception exception)
                 {
-                    try { _keyboardOutput.ReleaseAll(previous); } catch (Win32Exception) { }
+                    // Runs on a background thread: any escaping exception terminates the whole
+                    // process. Controller/HID drivers can throw a range of types (Win32,
+                    // DllNotFound, SEH/AccessViolation-wrapped, etc.), so catch all, recover,
+                    // and keep polling instead of crashing.
+                    AppLog.Error("D-padポーリング中に例外が発生しました。", exception);
+                    try { _keyboardOutput.ReleaseAll(previous); } catch (Exception releaseException) { AppLog.Error("キー解放に失敗しました。", releaseException); }
                     previous = DpadButtons.None;
                     connected = false;
                     StatusChanged?.Invoke(this, new MappingStatusChangedEventArgs(false, null, exception.Message));

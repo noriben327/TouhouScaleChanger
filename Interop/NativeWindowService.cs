@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 using System.IO;
+using TouhouScaleChanger.Diagnostics;
 
 namespace TouhouScaleChanger.Interop;
 
@@ -30,15 +31,22 @@ public sealed class NativeWindowService
         long bestArea = -1;
         EnumWindows((window, _) =>
         {
-            GetWindowThreadProcessId(window, out var ownerProcessId);
-            if (ownerProcessId != processId || !IsWindowVisible(window) || GetWindow(window, 4) != nint.Zero)
-                return true;
-            if (!GetClientRect(window, out var rect)) return true;
-            var area = (long)Math.Max(0, rect.Right - rect.Left) * Math.Max(0, rect.Bottom - rect.Top);
-            if (area > bestArea)
+            try
             {
-                bestArea = area;
-                bestWindow = window;
+                GetWindowThreadProcessId(window, out var ownerProcessId);
+                if (ownerProcessId != processId || !IsWindowVisible(window) || GetWindow(window, 4) != nint.Zero)
+                    return true;
+                if (!GetClientRect(window, out var rect)) return true;
+                var area = (long)Math.Max(0, rect.Right - rect.Left) * Math.Max(0, rect.Bottom - rect.Top);
+                if (area > bestArea)
+                {
+                    bestArea = area;
+                    bestWindow = window;
+                }
+            }
+            catch (Exception exception)
+            {
+                AppLog.Error("メインウィンドウ探索中に例外が発生しました。", exception);
             }
             return true;
         }, nint.Zero);
@@ -53,21 +61,28 @@ public sealed class NativeWindowService
         var windows = new List<RunningWindowInfo>();
         EnumWindows((window, _) =>
         {
-            if (!IsWindowVisible(window) || GetWindow(window, 4) != nint.Zero) return true;
-            GetWindowThreadProcessId(window, out var processId);
-            if (processId == 0 || processId == excludedProcessId) return true;
+            try
+            {
+                if (!IsWindowVisible(window) || GetWindow(window, 4) != nint.Zero) return true;
+                GetWindowThreadProcessId(window, out var processId);
+                if (processId == 0 || processId == excludedProcessId) return true;
 
-            var titleLength = GetWindowTextLength(window);
-            if (titleLength <= 0) return true;
-            var titleBuffer = new StringBuilder(titleLength + 1);
-            if (GetWindowText(window, titleBuffer, titleBuffer.Capacity) <= 0) return true;
+                var titleLength = GetWindowTextLength(window);
+                if (titleLength <= 0) return true;
+                var titleBuffer = new StringBuilder(titleLength + 1);
+                if (GetWindowText(window, titleBuffer, titleBuffer.Capacity) <= 0) return true;
 
-            var executablePath = TryGetProcessPath(processId);
-            var processName = executablePath.Length > 0
-                ? Path.GetFileNameWithoutExtension(executablePath)
-                : TryGetProcessName(unchecked((int)processId));
-            windows.Add(new RunningWindowInfo(window, unchecked((int)processId), titleBuffer.ToString(),
-                processName, executablePath));
+                var executablePath = TryGetProcessPath(processId);
+                var processName = executablePath.Length > 0
+                    ? Path.GetFileNameWithoutExtension(executablePath)
+                    : TryGetProcessName(unchecked((int)processId));
+                windows.Add(new RunningWindowInfo(window, unchecked((int)processId), titleBuffer.ToString(),
+                    processName, executablePath));
+            }
+            catch (Exception exception)
+            {
+                AppLog.Error("ウィンドウ列挙中に例外が発生しました。", exception);
+            }
             return true;
         }, nint.Zero);
 

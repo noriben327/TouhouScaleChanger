@@ -323,6 +323,11 @@ public partial class MainWindow : Window
         if (_reallyClosing) return;
         _reallyClosing = true;
         CleanupApplication();
+        // ShutdownMode is OnExplicitShutdown, so closing the window does NOT end the app on
+        // its own. Without this call the process would linger headless (no window, no tray
+        // icon) holding the single-instance mutex — the "already running" zombie. Shut down
+        // explicitly so the X button fully exits.
+        System.Windows.Application.Current.Shutdown();
     }
 
     private void StayInTray()
@@ -348,6 +353,12 @@ public partial class MainWindow : Window
         Close();
         System.Windows.Application.Current.Shutdown();
     }
+
+    /// <summary>
+    /// Invoked by the global fatal-exception handler (possibly from a non-UI thread) to
+    /// tear down the tray icon and background runtime before the process exits.
+    /// </summary>
+    public void ForceCleanup() => CleanupApplication();
 
     private void CleanupApplication()
     {

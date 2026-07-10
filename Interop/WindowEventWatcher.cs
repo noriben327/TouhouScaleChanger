@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using TouhouScaleChanger.Diagnostics;
 
 namespace TouhouScaleChanger.Interop;
 
@@ -36,8 +37,18 @@ public sealed class WindowEventWatcher : IDisposable
 
     private void OnWinEvent(nint hook, uint eventType, nint hwnd, int objectId, int childId, uint threadId, uint eventTime)
     {
-        if (hwnd != nint.Zero && (eventType == EventSystemForeground || objectId == ObjidWindow))
-            WindowEvent?.Invoke(this, new WindowEventArgs(hwnd, eventType));
+        // This method is invoked by user32 across a native->managed boundary. A managed
+        // exception unwinding into that native frame leaves the process in a corrupted,
+        // half-torn-down state (UI gone, process alive as a tray zombie). Never let one out.
+        try
+        {
+            if (hwnd != nint.Zero && (eventType == EventSystemForeground || objectId == ObjidWindow))
+                WindowEvent?.Invoke(this, new WindowEventArgs(hwnd, eventType));
+        }
+        catch (Exception exception)
+        {
+            AppLog.Error("ウィンドウイベント処理で例外が発生しました。", exception);
+        }
     }
 
     private delegate void WinEventDelegate(nint hook, uint eventType, nint hwnd, int objectId, int childId, uint threadId, uint eventTime);
