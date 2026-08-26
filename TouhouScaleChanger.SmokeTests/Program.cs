@@ -16,6 +16,7 @@ internal static class Program
         try
         {
             VerifyDefaultPresets();
+            VerifyStartupDefaultsAndCommand();
             VerifyResizeKeepsPositionWhenRequested();
             VerifyEventDrivenResize();
             Console.WriteLine("TouhouScaleChanger smoke tests passed.");
@@ -41,6 +42,16 @@ internal static class Program
             "Expected multiple 16:9 presets.");
         Assert(settings.SizePresets.Select(item => item.Id).Distinct().Count() == settings.SizePresets.Count,
             "Preset IDs must be unique.");
+    }
+
+    private static void VerifyStartupDefaultsAndCommand()
+    {
+        var settings = AppSettings.CreateDefault();
+        Assert(!settings.StartWithWindows, "Windows auto-start must be off by default.");
+        Assert(!settings.StartMinimizedToTrayOnAutoStart, "Start-in-tray must be off by default.");
+        Assert(StartupRegistrationService.BuildCommand(@"C:\Apps\TouhouScaleChanger.exe") ==
+               "\"C:\\Apps\\TouhouScaleChanger.exe\" --autostart",
+            "The Windows auto-start command was not quoted correctly.");
     }
 
     private static void VerifyResizeKeepsPositionWhenRequested()
