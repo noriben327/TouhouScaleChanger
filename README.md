@@ -10,9 +10,9 @@
 
 ## ダウンロード
 
-- [TouhouScaleChanger v0.3.1 / Windows x64 zip](https://github.com/noriben327/TouhouScaleChanger/releases/download/v0.3.1/TouhouScaleChanger-v0.3.1-win-x64.zip)
+- [TouhouScaleChanger v0.4.0 / Windows x64 zip](https://github.com/noriben327/TouhouScaleChanger/releases/download/v0.4.0/TouhouScaleChanger-v0.4.0-win-x64.zip)
 
-zipを展開して、`TouhouScaleChanger.exe` を起動してください。
+zipを展開して、単体実行ファイルの `TouhouScaleChanger.exe` を起動してください。.NET Runtimeのインストールは不要です。
 
 ## できること
 
@@ -50,14 +50,14 @@ Windows起動時にも常駐させたい場合は、「動作設定」で自動�
 
 ## 配布形態
 
-TouhouScaleChangerはzip配布を想定したポータブルアプリです。
+TouhouScaleChangerは、Windows x64向けの単体実行ファイルをzipに収めたポータブルアプリです。
 
-設定は `TouhouScaleChanger.exe` と同じフォルダの `TouhouScaleChanger.settings.json` に保存されます。
+初回起動時にはEXE以外のファイルを必要としません。設定を変更すると、`TouhouScaleChanger.exe` と同じフォルダに `TouhouScaleChanger.settings.json` が作成されます。
 アンインストールするときは、展開したTouhouScaleChangerフォルダを削除してください。
 
 単一EXE版は次のコマンドで発行できます。
 
-```powershell
+```bash
 dotnet publish -p:PublishProfile=SingleFileWinX64
 ```
 
