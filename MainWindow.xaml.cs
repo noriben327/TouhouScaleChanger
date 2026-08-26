@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using Microsoft.Win32;
+using TouhouScaleChanger.Diagnostics;
 using TouhouScaleChanger.Models;
 using TouhouScaleChanger.Interop;
 using TouhouScaleChanger.Services;
@@ -23,6 +24,7 @@ public partial class MainWindow : Window
     private static readonly System.Windows.Media.Brush PausedBrush = new SolidColorBrush(MediaColor.FromRgb(151, 160, 176));
 
     private readonly SettingsService _settingsService = new();
+    private readonly StartupRegistrationService _startupRegistrationService = new();
     private readonly AppSettings _settings;
     private readonly RuntimeCoordinator _runtime;
     private readonly Forms.NotifyIcon _trayIcon;
@@ -32,6 +34,8 @@ public partial class MainWindow : Window
     private bool _reallyClosing;
     private bool _cleanedUp;
     private bool _uiReady;
+
+    public bool ShouldStartMinimizedToTray => _settings.StartMinimizedToTrayOnAutoStart;
 
     public MainWindow()
     {
@@ -65,11 +69,20 @@ public partial class MainWindow : Window
 
         RefreshProfiles();
         RefreshSizePresets();
+        StartWithWindowsCheckBox.IsChecked = _settings.StartWithWindows;
+        StartMinimizedToTrayCheckBox.IsChecked = _settings.StartMinimizedToTrayOnAutoStart;
+        StartMinimizedToTrayCheckBox.IsEnabled = _settings.StartWithWindows;
         SelectPollingInterval(_settings.PollingIntervalMilliseconds);
         SettingsPathTextBlock.Text = $"設定ファイル: {_settingsService.SettingsPath}";
         _uiReady = true;
 
         if (_settings.MonitoringEnabled) _runtime.Start(); else UpdateMonitoringUi(false);
+
+        if (_settings.StartWithWindows)
+        {
+            try { _startupRegistrationService.SetEnabled(true); }
+            catch (Exception exception) { AppLog.Error("Windows自動起動の登録を更新できませんでした。", exception); }
+        }
     }
 
     private void RefreshProfiles(Guid? selectId = null)
@@ -288,6 +301,33 @@ public partial class MainWindow : Window
         SaveSettings();
     }
 
+    private void StartWithWindowsCheckBox_OnClick(object sender, RoutedEventArgs e)
+    {
+        var requested = StartWithWindowsCheckBox.IsChecked == true;
+        try
+        {
+            _startupRegistrationService.SetEnabled(requested);
+            _settings.StartWithWindows = requested;
+            StartMinimizedToTrayCheckBox.IsEnabled = requested;
+            SaveSettings();
+            FooterStatusText.Text = requested
+                ? "Windowsへのサインイン時に自動起動します"
+                : "Windows自動起動を解除しました";
+        }
+        catch (Exception exception) when (exception is UnauthorizedAccessException or System.Security.SecurityException or IOException or InvalidOperationException)
+        {
+            StartWithWindowsCheckBox.IsChecked = _settings.StartWithWindows;
+            StartMinimizedToTrayCheckBox.IsEnabled = _settings.StartWithWindows;
+            WpfMessageBox.Show(this, $"Windows自動起動の設定を変更できませんでした。\n{exception.Message}", "TouhouScaleChanger");
+        }
+    }
+
+    private void StartMinimizedToTrayCheckBox_OnClick(object sender, RoutedEventArgs e)
+    {
+        _settings.StartMinimizedToTrayOnAutoStart = StartMinimizedToTrayCheckBox.IsChecked == true;
+        SaveSettings();
+    }
+
     private void SelectPollingInterval(int interval)
     {
         foreach (var item in PollingIntervalComboBox.Items.OfType<ComboBoxItem>())
@@ -330,13 +370,18 @@ public partial class MainWindow : Window
         System.Windows.Application.Current.Shutdown();
     }
 
-    private void StayInTray()
+    public void StartInTray() => StayInTray(showBalloonTip: false);
+
+    private void StayInTray(bool showBalloonTip = true)
     {
         _trayIcon.Visible = true;
         Hide();
-        _trayIcon.ShowBalloonTip(1500, "TouhouScaleChanger",
-            "タスクトレイでゲームの起動を監視しています。終了するにはトレイメニューの「終了」を選んでください。",
-            Forms.ToolTipIcon.Info);
+        if (showBalloonTip)
+        {
+            _trayIcon.ShowBalloonTip(1500, "TouhouScaleChanger",
+                "タスクトレイでゲームの起動を監視しています。終了するにはトレイメニューの「終了」を選んでください。",
+                Forms.ToolTipIcon.Info);
+        }
     }
 
     private void ShowFromTray()

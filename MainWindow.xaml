@@ -124,10 +124,13 @@
                                 <CheckBox x:Name="ProfileEnabledCheckBox" Content="ゲーム起動時に自動適用" IsChecked="True" Margin="0,10,0,0" />
                             </StackPanel>
 
-                            <Border Grid.Row="5" Margin="0,20,0,0" Padding="12" Background="#EAF0FF" CornerRadius="6"
+                            <Border Grid.Row="5" Margin="0,16,0,0" Padding="12,9" Background="#EAF0FF" CornerRadius="6"
                                     VerticalAlignment="Top">
-                                <TextBlock TextWrapping="Wrap"
-                                           Text="指定サイズはゲームの描画領域（クライアント領域）へ適用します。ゲームが前面にある間だけXboxコントローラーのD-pad入力を送信します。" />
+                                <TextBlock TextWrapping="Wrap">
+                                    <Run Text="指定サイズをゲームの描画領域（クライアント領域）へ適用します。" />
+                                    <LineBreak />
+                                    <Run Text="D-pad入力は、ゲームが前面にある間だけカーソルキーとして送信します。" />
+                                </TextBlock>
                             </Border>
 
                             <Button Grid.Row="6" Content="プロファイルを保存" HorizontalAlignment="Right"
@@ -195,6 +198,15 @@
 
             <TabItem Header="動作設定">
                 <StackPanel Margin="28" MaxWidth="600" HorizontalAlignment="Left">
+                    <TextBlock Text="Windows起動時" FontSize="17" FontWeight="SemiBold" />
+                    <CheckBox x:Name="StartWithWindowsCheckBox" Margin="0,12,0,0"
+                              Content="Windowsへのサインイン時にTouhouScaleChangerを自動起動"
+                              Click="StartWithWindowsCheckBox_OnClick" />
+                    <CheckBox x:Name="StartMinimizedToTrayCheckBox" Margin="22,10,0,0"
+                              Content="自動起動時はタスクトレイに最小化"
+                              Click="StartMinimizedToTrayCheckBox_OnClick" />
+
+                    <Separator Margin="0,24" />
                     <TextBlock Text="入力ポーリング間隔" FontSize="17" FontWeight="SemiBold" />
                     <TextBlock Text="対象ゲーム起動中かつD-pad変換が有効な場合だけ動作します。" Margin="0,5,0,12"
                                Foreground="{StaticResource MutedBrush}" />

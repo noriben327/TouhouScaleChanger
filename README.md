@@ -24,6 +24,8 @@ zipを展開して、`TouhouScaleChanger.exe` を起動してください。
 - 対象ゲームの起動を検出して、自動で拡大とD-pad変換を開始
 - 対象ゲームが終了したら処理を停止
 - 「タスクトレイに常駐させる」ボタンでタスクトレイへ格納
+- Windowsへのサインイン時に自動起動（デフォルトOFF）
+- 自動起動した場合だけタスクトレイへ最小化（デフォルトOFF）
 
 ## 想定用途
 
@@ -43,12 +45,21 @@ zipを展開して、`TouhouScaleChanger.exe` を起動してください。
 
 常駐させたい場合は、画面上部の「タスクトレイに常駐させる」ボタンを押してください。
 
+Windows起動時にも常駐させたい場合は、「動作設定」で自動起動を有効にします。
+「自動起動時はタスクトレイに最小化」も有効にすると、手動で起動したときは通常表示のまま、自動起動時だけタスクトレイに格納されます。
+
 ## 配布形態
 
 TouhouScaleChangerはzip配布を想定したポータブルアプリです。
 
 設定は `TouhouScaleChanger.exe` と同じフォルダの `TouhouScaleChanger.settings.json` に保存されます。
 アンインストールするときは、展開したTouhouScaleChangerフォルダを削除してください。
+
+単一EXE版は次のコマンドで発行できます。
+
+```powershell
+dotnet publish -p:PublishProfile=SingleFileWinX64
+```
 
 ## ライセンス
 

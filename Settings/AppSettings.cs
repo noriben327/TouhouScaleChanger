@@ -6,6 +6,8 @@ public sealed class AppSettings
 {
     public int Version { get; set; } = 1;
     public bool MonitoringEnabled { get; set; } = true;
+    public bool StartWithWindows { get; set; }
+    public bool StartMinimizedToTrayOnAutoStart { get; set; }
     public int PollingIntervalMilliseconds { get; set; } = 2;
     public List<SizePreset> SizePresets { get; set; } = [];
     public List<GameProfile> GameProfiles { get; set; } = [];

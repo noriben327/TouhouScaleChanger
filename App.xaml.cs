@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using TouhouScaleChanger.Diagnostics;
+using TouhouScaleChanger.Services;
 
 namespace TouhouScaleChanger;
 
@@ -30,7 +31,16 @@ public partial class App : System.Windows.Application
         base.OnStartup(e);
         _mainWindow = new MainWindow();
         MainWindow = _mainWindow;
-        _mainWindow.Show();
+        var startedAutomatically = e.Args.Any(argument =>
+            string.Equals(argument, StartupRegistrationService.AutoStartArgument, StringComparison.OrdinalIgnoreCase));
+        if (startedAutomatically && _mainWindow.ShouldStartMinimizedToTray)
+        {
+            _mainWindow.StartInTray();
+        }
+        else
+        {
+            _mainWindow.Show();
+        }
     }
 
     private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
