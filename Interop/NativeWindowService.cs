@@ -102,7 +102,8 @@ public sealed class NativeWindowService
         return false;
     }
 
-    public bool ResizeClientArea(nint window, int clientWidth, int clientHeight, bool centerWindow = true)
+    public bool ResizeClientArea(nint window, int clientWidth, int clientHeight, bool centerWindow = true,
+        ClassicResizeCompatibility? compatibility = null)
     {
         if (window == nint.Zero || clientWidth <= 0 || clientHeight <= 0) return false;
         if (!GetClientRect(window, out var currentClient)) return false;
@@ -132,7 +133,10 @@ public sealed class NativeWindowService
         }
 
         ShowWindow(window, SwRestore);
-        return SetWindowPos(window, nint.Zero, x, y, width, height, SwpNoActivate);
+        var requested = SetWindowPos(window, nint.Zero, x, y, width, height, SwpNoActivate | 0x0004);
+        if (requested && TryGetClientSize(window, out var actualWidth, out var actualHeight) &&
+            actualWidth == clientWidth && actualHeight == clientHeight) return true;
+        return compatibility?.TryResize(window, x, y, width, height, clientWidth, clientHeight) == true;
     }
 
     private static string TryGetProcessPath(uint processId)

@@ -12,6 +12,7 @@ internal static class Program
     private static int Main(string[] args)
     {
         if (args.Contains("--target", StringComparer.Ordinal)) return RunSmokeTarget();
+        if (args.Contains("--live-resize", StringComparer.Ordinal)) return VerifyLiveResize();
 
         try
         {
@@ -28,6 +29,46 @@ internal static class Program
             return 1;
         }
     }
+
+    private static int VerifyLiveResize()
+    {
+        var native = new TouhouScaleChanger.Interop.NativeWindowService();
+        foreach (var name in new[] { "th06c", "th06nc" })
+        {
+            using var process = Process.GetProcessesByName(name).Single();
+            Assert(native.TryFindMainWindow(process.Id, out var hwnd), "No game window.");
+            Assert(native.TryGetClientSize(hwnd, out var originalWidth, out var originalHeight), "Cannot read size.");
+            var compatibility = TouhouScaleChanger.Interop.ClassicResizeCompatibility.ForProcess(name);
+            var height = name == "th06c" ? 1200 : 900;
+            try
+            {
+                foreach (var size in new[] { (1600, height), (1280, name == "th06c" ? 960 : 720), (1600, height) })
+                {
+                    Assert(native.ResizeClientArea(hwnd, size.Item1, size.Item2, false, compatibility), $"{name}: resize rejected.");
+                    Thread.Sleep(250);
+                    Assert(native.TryGetClientSize(hwnd, out var width, out var actualHeight) && width == size.Item1 && actualHeight == size.Item2,
+                        $"{name}: requested size did not persist.");
+                    Console.WriteLine($"{name}: {width}x{actualHeight} verified");
+                }
+                ShowWindow(hwnd, 6);
+                Thread.Sleep(150);
+                ShowWindow(hwnd, 9);
+                Thread.Sleep(150);
+                Assert(native.ResizeClientArea(hwnd, 1600, height, false, compatibility), $"{name}: restore from minimized failed.");
+                Console.WriteLine($"{name}: minimize/restore verified; visual inspection hold (20 seconds)");
+                Thread.Sleep(20000);
+            }
+            finally
+            {
+                Assert(native.ResizeClientArea(hwnd, originalWidth, originalHeight, false, compatibility), $"{name}: restore failed.");
+                Console.WriteLine($"{name}: restored {originalWidth}x{originalHeight}");
+            }
+        }
+        return 0;
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll")]
+    private static extern bool ShowWindow(nint window, int command);
 
     private static void VerifyDefaultPresets()
     {

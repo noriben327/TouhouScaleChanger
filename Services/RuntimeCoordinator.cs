@@ -12,6 +12,7 @@ public sealed class RuntimeCoordinator : IDisposable
     private readonly NativeWindowService _windows = new();
     private readonly InputMappingService _mapping;
     private readonly Dictionary<int, ActiveSession> _sessions = [];
+    private Dictionary<int, ClassicResizeCompatibility?>? _reloadCompatibility;
     private readonly object _sync = new();
     private GameProfile[] _profileSnapshot = [];
     private Dictionary<Guid, SizePreset> _presetSnapshot = [];
@@ -63,8 +64,14 @@ public sealed class RuntimeCoordinator : IDisposable
     public void ReloadProfiles()
     {
         if (!_monitoring) return;
-        Stop();
-        Start();
+        lock (_sync)
+            _reloadCompatibility = _sessions.ToDictionary(item => item.Key, item => item.Value.ResizeCompatibility);
+        try
+        {
+            Stop();
+            Start();
+        }
+        finally { _reloadCompatibility = null; }
     }
 
     public void SetPollingInterval(int milliseconds)
@@ -166,6 +173,8 @@ public sealed class RuntimeCoordinator : IDisposable
             }
 
             var session = new ActiveSession(process, profile);
+            if (_reloadCompatibility?.TryGetValue(processId, out var compatibility) == true)
+                session.ResizeCompatibility = compatibility;
             _sessions.Add(processId, session);
             try
             {
@@ -195,7 +204,15 @@ public sealed class RuntimeCoordinator : IDisposable
 
         if (!_presetSnapshot.TryGetValue(session.Profile.SizePresetId, out var preset)) return;
 
-        if (_windows.ResizeClientArea(window, preset.Width, preset.Height, centerWindow))
+        if (session.IsResizing) return;
+        session.IsResizing = true;
+        bool resized;
+        try
+        {
+            resized = _windows.ResizeClientArea(window, preset.Width, preset.Height, centerWindow, session.ResizeCompatibility);
+        }
+        finally { session.IsResizing = false; }
+        if (resized)
         {
             lock (_sync)
             {
@@ -281,6 +298,8 @@ public sealed class RuntimeCoordinator : IDisposable
 
     private sealed class ActiveSession(Process process, GameProfile profile)
     {
+        public ClassicResizeCompatibility? ResizeCompatibility { get; set; } = ClassicResizeCompatibility.ForProcess(profile.ProcessName);
+        public bool IsResizing { get; set; }
         public Process Process { get; } = process;
         public GameProfile Profile { get; } = profile;
         public nint WindowHandle { get; set; }

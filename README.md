@@ -10,7 +10,7 @@
 
 ## ダウンロード
 
-- [TouhouScaleChanger v0.4.0 / Windows x64 zip](https://github.com/noriben327/TouhouScaleChanger/releases/download/v0.4.0/TouhouScaleChanger-v0.4.0-win-x64.zip)
+- [TouhouScaleChanger v0.4.1 / Windows x64 zip](https://github.com/noriben327/TouhouScaleChanger/releases/download/v0.4.1/TouhouScaleChanger-v0.4.1-win-x64.zip)
 
 zipを展開して、単体実行ファイルの `TouhouScaleChanger.exe` を起動してください。.NET Runtimeのインストールは不要です。
 
@@ -26,6 +26,11 @@ zipを展開して、単体実行ファイルの `TouhouScaleChanger.exe` を起
 - 「タスクトレイに常駐させる」ボタンでタスクトレイへ格納
 - Windowsへのサインイン時に自動起動（デフォルトOFF）
 - 自動起動した場合だけタスクトレイへ最小化（デフォルトOFF）
+- Steam版「東方紅魔郷：Classic」「New Classic」向けのサイズ変更互換処理
+
+Classic／New Classicは通常のサイズ変更が効かない場合に互換処理を自動適用します。
+既存のゲームプロファイルで希望のサイズを指定するだけで利用できます。New Classicは16:9、Classicは4:3のサイズを推奨します。
+変更後の実サイズを確認してから適用結果を表示します。
 
 ## 想定用途
 
