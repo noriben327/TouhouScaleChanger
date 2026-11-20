@@ -10,7 +10,7 @@
 
 ## ダウンロード
 
-- [TouhouScaleChanger v0.4.1 / Windows x64 zip](https://github.com/noriben327/TouhouScaleChanger/releases/download/v0.4.1/TouhouScaleChanger-v0.4.1-win-x64.zip)
+- [TouhouScaleChanger v0.4.2 / Windows x64 zip](https://github.com/noriben327/TouhouScaleChanger/releases/download/v0.4.2/TouhouScaleChanger-v0.4.2-win-x64.zip)
 
 zipを展開して、単体実行ファイルの `TouhouScaleChanger.exe` を起動してください。.NET Runtimeのインストールは不要です。
 
