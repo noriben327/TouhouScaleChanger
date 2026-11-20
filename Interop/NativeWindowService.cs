@@ -10,7 +10,7 @@ public sealed class NativeWindowService
     private const int GwlStyle = -16;
     private const int GwlExStyle = -20;
     private const uint SwpNoActivate = 0x0010;
-    private const int SwRestore = 9;
+    internal const uint SwpNoMove = 0x0002;
     private const uint MonitorDefaultToNearest = 2;
     private const uint GaRoot = 2;
     private const uint ProcessQueryLimitedInformation = 0x1000;
@@ -132,11 +132,13 @@ public sealed class NativeWindowService
             y = info.Work.Top + Math.Max(0, (info.Work.Bottom - info.Work.Top - height) / 2);
         }
 
-        ShowWindow(window, SwRestore);
-        var requested = SetWindowPos(window, nint.Zero, x, y, width, height, SwpNoActivate | 0x0004);
+        if (IsIconic(window)) return false;
+        uint flags = SwpNoActivate | 0x0004; // SWP_NOZORDER
+        if (!centerWindow) flags |= SwpNoMove;
+        var requested = SetWindowPos(window, nint.Zero, x, y, width, height, flags);
         if (requested && TryGetClientSize(window, out var actualWidth, out var actualHeight) &&
             actualWidth == clientWidth && actualHeight == clientHeight) return true;
-        return compatibility?.TryResize(window, x, y, width, height, clientWidth, clientHeight) == true;
+        return compatibility?.TryResize(window, x, y, width, height, clientWidth, clientHeight, flags) == true;
     }
 
     private static string TryGetProcessPath(uint processId)
@@ -190,7 +192,7 @@ public sealed class NativeWindowService
     [DllImport("user32.dll")] private static extern bool AdjustWindowRectExForDpi(ref Rect rect, uint style, bool menu, uint exStyle, uint dpi);
     [DllImport("user32.dll")] private static extern nint MonitorFromWindow(nint window, uint flags);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern bool GetMonitorInfo(nint monitor, ref MonitorInfo info);
-    [DllImport("user32.dll")] private static extern bool ShowWindow(nint window, int command);
+    [DllImport("user32.dll")] private static extern bool IsIconic(nint window);
     [DllImport("user32.dll", SetLastError = true)] private static extern bool SetWindowPos(nint window, nint insertAfter,
         int x, int y, int width, int height, uint flags);
     [DllImport("user32.dll")] private static extern nint GetForegroundWindow();

@@ -12,6 +12,7 @@ internal static class Program
     private static int Main(string[] args)
     {
         if (args.Contains("--target", StringComparer.Ordinal)) return RunSmokeTarget();
+        if (args.Contains("--retry-target", StringComparer.Ordinal)) return RunRetryTarget();
         if (args.Contains("--live-resize", StringComparer.Ordinal)) return VerifyLiveResize();
 
         try
@@ -19,6 +20,7 @@ internal static class Program
             VerifyDefaultPresets();
             VerifyStartupDefaultsAndCommand();
             VerifyResizeKeepsPositionWhenRequested();
+            VerifyFailedResizeRetryPosition();
             VerifyEventDrivenResize();
             Console.WriteLine("TouhouScaleChanger smoke tests passed.");
             return 0;
@@ -115,6 +117,58 @@ internal static class Program
         Assert(form.ClientSize == new System.Drawing.Size(700, 500),
             "In-place resize did not apply the requested client size.");
         form.Close();
+    }
+
+    private static void VerifyFailedResizeRetryPosition()
+    {
+        var preset = new SizePreset { Width = 700, Height = 500 };
+        var settings = new AppSettings
+        {
+            SizePresets = [preset],
+            GameProfiles = [new GameProfile { ProcessName = Process.GetCurrentProcess().ProcessName,
+                GameName = "Retry target", SizePresetId = preset.Id, IsEnabled = true, DpadMappingEnabled = false }]
+        };
+        using var coordinator = new RuntimeCoordinator(settings);
+        int failed = 0;
+        coordinator.StatusChanged += (_, status) =>
+        {
+            if (status.Message.Contains("変更できませんでした")) Interlocked.Increment(ref failed);
+        };
+        coordinator.Start();
+        using var child = Process.Start(Environment.ProcessPath!, "--retry-target")!;
+        var timeout = Stopwatch.StartNew();
+        while (!child.HasExited && timeout.Elapsed < TimeSpan.FromSeconds(8))
+        {
+            Forms.Application.DoEvents();
+            Thread.Sleep(10);
+        }
+        if (!child.HasExited) child.Kill();
+        child.WaitForExit();
+        Assert(child.ExitCode == 0 && failed >= 2, $"Resize retry moved the window or was not exercised ({child.ExitCode}, {failed} failures).");
+    }
+
+    private static int RunRetryTarget()
+    {
+        var manualPosition = new System.Drawing.Point(111, 123);
+        using var form = new Forms.Form { StartPosition = Forms.FormStartPosition.Manual,
+            Text = "Resize retry regression", MaximumSize = new System.Drawing.Size(360, 300) };
+        using var timer = new Forms.Timer { Interval = 700 };
+        int step = 0;
+        bool preserved = false;
+        timer.Tick += (_, _) =>
+        {
+            if (step++ == 0)
+            {
+                form.Hide();
+                form.Location = manualPosition;
+                form.Show();
+                form.Activate();
+            }
+            else { preserved = form.Location == manualPosition; form.Close(); }
+        };
+        timer.Start();
+        Forms.Application.Run(form);
+        return preserved ? 0 : 1;
     }
 
     private static void VerifyEventDrivenResize()

@@ -106,7 +106,7 @@ public sealed class RuntimeCoordinator : IDisposable
                     process.Dispose();
                     continue;
                 }
-                AttachProcess(process, profile);
+                AttachProcess(process, profile, centerOnFirstAttempt: false);
                 if (_windows.TryFindMainWindow(process.Id, out var window)) ApplyProfile(process.Id, window);
             }
         }
@@ -155,13 +155,13 @@ public sealed class RuntimeCoordinator : IDisposable
             return;
         }
 
-        AttachProcess(process, profile);
+        AttachProcess(process, profile, centerOnFirstAttempt: true);
         if (_windows.TryFindMainWindow(processId, out var detectedMainWindow))
             ApplyProfile(processId, detectedMainWindow);
         UpdateMappingState();
     }
 
-    private void AttachProcess(Process process, GameProfile profile)
+    private void AttachProcess(Process process, GameProfile profile, bool centerOnFirstAttempt)
     {
         var processId = process.Id;
         lock (_sync)
@@ -172,7 +172,7 @@ public sealed class RuntimeCoordinator : IDisposable
                 return;
             }
 
-            var session = new ActiveSession(process, profile);
+            var session = new ActiveSession(process, profile) { CenterOnNextAttempt = centerOnFirstAttempt };
             if (_reloadCompatibility?.TryGetValue(processId, out var compatibility) == true)
                 session.ResizeCompatibility = compatibility;
             _sessions.Add(processId, session);
@@ -195,32 +195,25 @@ public sealed class RuntimeCoordinator : IDisposable
     {
         ActiveSession? session;
         bool centerWindow;
+        SizePreset? preset;
         lock (_sync)
         {
             if (!_sessions.TryGetValue(processId, out session)) return;
-            centerWindow = !session.HasAppliedSize || session.WindowHandle != window;
+            if (session.IsResizing || !_presetSnapshot.TryGetValue(session.Profile.SizePresetId, out preset)) return;
+            session.IsResizing = true;
+            centerWindow = session.CenterOnNextAttempt;
+            session.CenterOnNextAttempt = false;
             session.WindowHandle = window;
         }
 
-        if (!_presetSnapshot.TryGetValue(session.Profile.SizePresetId, out var preset)) return;
-
-        if (session.IsResizing) return;
-        session.IsResizing = true;
         bool resized;
         try
         {
             resized = _windows.ResizeClientArea(window, preset.Width, preset.Height, centerWindow, session.ResizeCompatibility);
         }
-        finally { session.IsResizing = false; }
+        finally { lock (_sync) session.IsResizing = false; }
         if (resized)
-        {
-            lock (_sync)
-            {
-                if (_sessions.TryGetValue(processId, out var currentSession) && currentSession.WindowHandle == window)
-                    currentSession.HasAppliedSize = true;
-            }
             RaiseStatus($"{session.Profile.GameName}: {preset.Width}×{preset.Height} を適用しました");
-        }
         else
             RaiseStatus($"{session.Profile.GameName}: ウィンドウサイズを変更できませんでした");
     }
@@ -303,7 +296,7 @@ public sealed class RuntimeCoordinator : IDisposable
         public Process Process { get; } = process;
         public GameProfile Profile { get; } = profile;
         public nint WindowHandle { get; set; }
-        public bool HasAppliedSize { get; set; }
+        public bool CenterOnNextAttempt { get; set; }
     }
 }
 

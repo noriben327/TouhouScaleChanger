@@ -22,7 +22,7 @@ public sealed class ClassicResizeCompatibility
         };
 
     public bool TryResize(nint window, int x, int y, int outerWidth, int outerHeight,
-        int clientWidth, int clientHeight)
+        int clientWidth, int clientHeight, uint positionFlags)
     {
         if (!GetWindowRect(window, out var before) || !GetClientRect(window, out var client)) return false;
         // Keep the original render baseline across repeated profile changes. A game-side
@@ -38,7 +38,7 @@ public sealed class ClassicResizeCompatibility
         try
         {
             resized = SendSizing(window, ref target) &&
-                SetWindowPos(window, 0, x, y, outerWidth, outerHeight, 0x0434);
+                SetWindowPos(window, 0, x, y, outerWidth, outerHeight, positionFlags | 0x0420);
         }
         finally
         {
